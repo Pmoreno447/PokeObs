@@ -1,9 +1,11 @@
-import { setTimeout } from 'node:timers/promises';
 import WebSocket, { WebSocketServer } from 'ws';
-import { procesarMedallas } from './azaharConnection.js';
+import { procesarMedallas } from './azahar3ds/games/xy.js';
+import { userConfig } from './config/userConfig/userConfig.js';
+
+const WEBSOCKET_PORT = userConfig.websocket.port;
 
 const wss = new WebSocketServer({
-    port: 8080
+    port: WEBSOCKET_PORT
 });
 
 wss.on('connection', async function connection(ws) {
@@ -19,8 +21,4 @@ wss.on('connection', async function connection(ws) {
     if(medallas!=null){
          ws.send(medallas);
     }
-
-    await setTimeout(10000);
-
-    ws.send('xd');
 });

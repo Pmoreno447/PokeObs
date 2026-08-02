@@ -1,0 +1,1 @@
+export const AZAHAR_CURRENT_REQUEST_VERSION = 1;

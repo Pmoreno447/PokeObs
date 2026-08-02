@@ -1,0 +1,9 @@
+{
+  "azahar3ds": {
+    "citraPort": 45987,
+    "citraIp": "127.0.0.1"
+  },
+  "websocket": {
+    "port": 8080
+  }
+}

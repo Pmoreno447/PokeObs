@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc && cp src/config/userConfig/userConfig.json dist/src/config/userConfig/userConfig.json",
+    "start": "npm run build && node dist/src/overlayServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
