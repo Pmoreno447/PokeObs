@@ -13,6 +13,7 @@ function sendUdp(): void {
     });
 }
 
+// 0-4: version, 4-8: requestId, 8-12: requestType, 12-16: dataSize.
 function generateHeader(requestType: number, dataSize: number): [Buffer, Buffer] {
     const requestId = randomBytes(4);
 
@@ -47,13 +48,11 @@ function validateHeader(rawReply: Buffer, expectedType: number, expectedId: Buff
     }
 }
 
-function readMemory(address: number, dataSize: number): Buffer | null {
+async function readMemory(address: number, dataSize: number): Promise<Buffer | null> {
     // En caso de que pidamos más de 1KB necesitamos un bucle para procesar chunks
-    if(dataSize > 1023){
-        console.log("El tamaño de paquete supera el máximo posible.");
-        return null;
-    }
-    else {
+
+    // Creamos una promesa que será resuelta.
+    return new Promise((resolve, reject) => {
         // Reservamos espacio para el payload de nuestra petición
         const requestData = Buffer.alloc(8);
 
@@ -63,36 +62,54 @@ function readMemory(address: number, dataSize: number): Buffer | null {
 
         const [header, requestId] = generateHeader(1, requestData.length);
         const packet = Buffer.concat([header, requestData]);
-        client.send(packet, CITRA_PORT, '127.0.0.1');
 
-        console.log("Paquete enviado correctamente.");
-        
-        return requestId;
-    }
+        // Introducimos la promesa en el map, con su id.
+        myMap.set(requestId.toString('hex'), resolve);
+
+        client.send(packet, CITRA_PORT, '127.0.0.1');
+    });
 }
 
 const client = dgram.createSocket('udp4');
 
+let myMap = new Map<string, Function>();
+
 client.on('message', (msg, rinfo) => {
-    if(rinfo.port == CITRA_PORT){
-        console.log("Citra ha recibido el mensaje, " + msg.toString('hex'));
+    // Cuando recibimos un mensaje resolvemos la promesa.
+    const requestId = msg.subarray(4, 8).toString('hex');
+    const resolve = myMap.get(requestId.toString());
+
+    // Le entregamos los datos a quien corresponda.
+    if(resolve!=null){
+        myMap.delete(requestId.toString());
+        resolve(validateHeader(msg, 1, msg.subarray(4, 8)));
     }
-    else {
-        console.log("error de algun tipo");
+    else{
+        console.log("Error al resolver mensaje recibido");
     }
 })
 
+export async function procesarMedallas(): Promise<number | null> {
+    const datos = await readMemory(0x8C6A6A0, 1);
 
-readMemory(0x8C6A6A0, 1); // Direccion medallas pokemon x, 1 byte, 1 bit por medalla
+    if (datos!=null){
+        //console.log(datos.toString('hex'));
+        // La dirección de las medallas devuelve una máscara pero realemnte
+        // en el juego para conseguir una medalla debes obtener la anterior
+        // por lo que en vez de leer la máscara simplemente contamos la longitud 
+        // de la cadena, los primeros 0 se omiten.
+        const mascaraBinaria = parseInt(datos.toString('hex'), 16).toString(2);
+        if(mascaraBinaria == '0'){
+            return 0;
+        }
+        else {
+            return mascaraBinaria.length;
+        }
+    }
+    else{
+        //console.log("error al procesar medallas");
+        return null;
+    }
+}
 
-
-/*
-const requestData = Buffer.alloc(8);
-requestData.writeUInt32LE(0x100000, 0); // dirección de prueba
-requestData.writeUInt32LE(4, 4);        // tamaño a leer
-
-const [header, requestId] = generateHeader(1, requestData.length);
-const packet = Buffer.concat([header, requestData]);
-
-client.send(packet, CITRA_PORT, '127.0.0.1');
-*/
+//procesarMedallas();

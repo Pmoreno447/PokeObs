@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Test WebSocket</title>
+</head>
+<body>
+    <h1>Abre la consola (F12) para ver los mensajes</h1>
+ 
+    <script>
+        const socket = new WebSocket('ws://localhost:8080');
+ 
+        socket.addEventListener('open', () => {
+            console.log('Conectado al WebSocket');
+        });
+ 
+        socket.addEventListener('message', (event) => {
+            console.log('Mensaje recibido:', event.data);
+        });
+ 
+        socket.addEventListener('error', (error) => {
+            console.error('Error en el WebSocket:', error);
+        });
+ 
+        socket.addEventListener('close', () => {
+            console.log('Conexión cerrada');
+        });
+    </script>
+</body>
+</html>
