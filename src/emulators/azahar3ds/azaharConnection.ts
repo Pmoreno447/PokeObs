@@ -1,7 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import dgram from 'node:dgram';
-import {AZAHAR_CURRENT_REQUEST_VERSION} from '../config/constants.js'
-import { userConfig } from '../config/userConfig/userConfig.js'
+import {AZAHAR_CURRENT_REQUEST_VERSION} from '../../config/constants.js'
+import { userConfig } from '../../config/userConfig/userConfig.js'
 
 const CITRA_PORT = userConfig.azahar3ds.citraPort;
 const CITRA_IP = userConfig.azahar3ds.citraIp;

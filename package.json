@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && cp src/config/userConfig/userConfig.json dist/src/config/userConfig/userConfig.json",
-    "start": "npm run build && node dist/src/overlayServer.js",
+    "build": "tsc",
+    "start": "npm run build && node dist/src/main.js",
+    "gui": "cd pokeobs-gui && neu run",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,11 +14,13 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/node": "^26.1.2",
     "@types/ws": "^8.18.1",
     "typescript": "^7.0.2"
   },
   "dependencies": {
+    "express": "^5.2.1",
     "ws": "^8.21.1"
   }
 }

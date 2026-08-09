@@ -1,9 +1,5 @@
 import { readFileSync, writeFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const CONFIG_PATH = path.join(__dirname, 'userConfig.json');
+import { RUTA_CONFIG as CONFIG_PATH } from '../paths.js';
 
 interface Azahar3dsConfig {
     citraIp: string;
@@ -14,9 +10,14 @@ interface WebsocketConfig {
     port: number;
 }
 
+interface HttpServerConfig {
+    port: number;
+}
+
 interface UserConfigData {
     azahar3ds: Azahar3dsConfig;
     websocket: WebsocketConfig;
+    httpServer: HttpServerConfig;
 }
 
 // Config editable por el usuario (persistida en userConfig.json). Se lee con
@@ -58,6 +59,10 @@ class UserConfig {
 
     get websocket(): WebsocketConfig {
         return this.data.websocket;
+    }
+
+    get httpServer(): HttpServerConfig{
+        return this.data.httpServer;
     }
 }
 

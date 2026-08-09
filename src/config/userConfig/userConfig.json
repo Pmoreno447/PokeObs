@@ -4,6 +4,9 @@
     "citraIp": "127.0.0.1"
   },
   "websocket": {
-    "port": 8080
+    "port": 8081
+  },
+  "httpServer": {
+    "port": 8082
   }
 }
