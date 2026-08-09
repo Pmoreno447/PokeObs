@@ -1,9 +1,5 @@
 import { readFileSync, writeFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const CONFIG_PATH = path.join(__dirname, 'userConfig.json');
+import { RUTA_CONFIG as CONFIG_PATH } from '../paths.js';
 
 interface Azahar3dsConfig {
     citraIp: string;

@@ -1,0 +1,222 @@
+:root {
+    --fondo: #14161c;
+    --tarjeta: #1c1f27;
+    --borde: #2b303c;
+    --texto: #e6e8ee;
+    --texto-suave: #939aab;
+    --acento: #ef5350;
+    --acento-oscuro: #c62828;
+    --ok: #4caf50;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+h1 {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: 0.5px;
+}
+
+h2 {
+    margin: 0 0 10px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--texto-suave);
+}
+
+.estado {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.estado--parado {
+    background: #2b303c;
+    color: var(--texto-suave);
+}
+
+.estado--arrancando {
+    background: #4a3b12;
+    color: #ffca28;
+}
+
+.estado--activo {
+    background: #1b3d20;
+    color: var(--ok);
+}
+
+.estado--error {
+    background: #4a1b1b;
+    color: var(--acento);
+}
+
+.tarjeta {
+    background: var(--tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.campos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--texto-suave);
+    font-size: 12px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 8px 10px;
+    background: #12141a;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    color: var(--texto);
+    font-size: 14px;
+    font-family: inherit;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--acento);
+}
+
+input:disabled,
+select:disabled {
+    opacity: 0.5;
+}
+
+input.invalido {
+    border-color: var(--acento);
+}
+
+.ayuda {
+    margin: 12px 0 0;
+    color: var(--texto-suave);
+    font-size: 12px;
+}
+
+.ayuda code {
+    color: var(--texto);
+}
+
+.acciones {
+    display: flex;
+    gap: 10px;
+}
+
+.boton {
+    flex: 1;
+    padding: 10px 14px;
+    background: var(--tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    color: var(--texto);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.boton:hover:not(:disabled) {
+    border-color: var(--texto-suave);
+}
+
+.boton:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.boton--primario {
+    background: var(--acento-oscuro);
+    border-color: var(--acento-oscuro);
+}
+
+.boton--primario:hover:not(:disabled) {
+    background: var(--acento);
+    border-color: var(--acento);
+}
+
+.boton--secundario {
+    flex: 0 0 auto;
+}
+
+.tarjeta--registro {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.registro-cabecera {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.enlace {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--texto-suave);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.registro {
+    margin: 0;
+    height: 160px;
+    overflow-y: auto;
+    padding: 10px;
+    background: #0e1015;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    color: var(--texto-suave);
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.registro .error {
+    color: var(--acento);
+}

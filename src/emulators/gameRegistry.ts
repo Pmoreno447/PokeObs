@@ -10,9 +10,22 @@ const juegosSoportados: Record<string, GameModule> = {
     "PokemonXY-1.1": crearXY("1.1")
 }
 
+//Devuelve los identificadores de juego que la GUI puede ofrecer
+export function listarJuegosSoportados(): string[] {
+    return Object.keys(juegosSoportados);
+}
+
 //Función que establece el juego seleccionado
 export function seleccionarJuego(nombre: string): void {
-    juegoActivo = juegosSoportados[nombre] ?? null;
+    const juego = juegosSoportados[nombre];
+
+    if (!juego) {
+        throw new Error(
+            `Juego no soportado: "${nombre}". Disponibles: ${listarJuegosSoportados().join(', ')}`
+        );
+    }
+
+    juegoActivo = juego;
 }
 
 //Comprueba cuales son las funcionalidades disponibles

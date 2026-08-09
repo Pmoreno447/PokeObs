@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <title>PokeObs</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main id="app">
+      <header>
+        <h1>PokeObs</h1>
+        <span id="estado" class="estado estado--parado">Parado</span>
+      </header>
+
+      <section class="tarjeta">
+        <h2>Juego</h2>
+        <label for="juego">Juego y versión</label>
+        <select id="juego"></select>
+      </section>
+
+      <section class="tarjeta">
+        <h2>Ajustes</h2>
+
+        <div class="campos">
+          <div class="campo">
+            <label for="puertoWebsocket">Puerto WebSocket</label>
+            <input id="puertoWebsocket" type="number" min="1" max="65535" step="1">
+          </div>
+
+          <div class="campo">
+            <label for="puertoHttp">Puerto servidor HTTP</label>
+            <input id="puertoHttp" type="number" min="1" max="65535" step="1">
+          </div>
+
+          <div class="campo">
+            <label for="ipCitra">IP de Citra / Azahar</label>
+            <input id="ipCitra" type="text" spellcheck="false">
+          </div>
+
+          <div class="campo">
+            <label for="puertoCitra">Puerto de Citra / Azahar</label>
+            <input id="puertoCitra" type="number" min="1" max="65535" step="1">
+          </div>
+        </div>
+
+        <p class="ayuda">Los ajustes se guardan en <code>userConfig.json</code> y se aplican al arrancar.</p>
+      </section>
+
+      <div class="acciones">
+        <button id="btnArrancar" class="boton boton--primario">Arrancar</button>
+        <button id="btnParar" class="boton" disabled>Parar</button>
+        <button id="btnCompilar" class="boton boton--secundario">Compilar</button>
+      </div>
+
+      <section class="tarjeta tarjeta--registro">
+        <div class="registro-cabecera">
+          <h2>Registro</h2>
+          <button id="btnLimpiar" class="enlace">Limpiar</button>
+        </div>
+        <pre id="registro" class="registro"></pre>
+      </section>
+    </main>
+
+    <!-- Neutralino.js client. This file is gitignored,
+        because `neu update` typically downloads it.
+        Avoid copy-pasting it.
+        -->
+    <script src="/js/neutralino.js"></script>
+    <!-- Your app's source files -->
+    <script src="/js/main.js"></script>
+  </body>
+</html>

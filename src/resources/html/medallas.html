@@ -17,7 +17,7 @@
 
     <script>
         const miNumero = __NUMERO_MEDALLA__;
-        const socket = new WebSocket('ws://localhost:8080');
+        const socket = new WebSocket('ws://localhost:__PUERTO_WEBSOCKET__');
         const imagen = document.getElementById('medalla');
 
         socket.addEventListener('message', (event) => {

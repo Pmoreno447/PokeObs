@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && cp src/config/userConfig/userConfig.json dist/src/config/userConfig/userConfig.json",
-    "start": "npm run build && node dist/src/overlayServer.js",
+    "build": "tsc",
+    "start": "npm run build && node dist/src/main.js",
+    "gui": "cd pokeobs-gui && neu run",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
