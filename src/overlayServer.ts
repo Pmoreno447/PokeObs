@@ -1,6 +1,6 @@
 import WebSocket, { WebSocketServer } from 'ws';
-import { procesarMedallas } from './azahar3ds/games/xy.js';
 import { userConfig } from './config/userConfig/userConfig.js';
+import { seleccionarJuego, leerMedallas } from './emulators/gameRegistry.js';
 
 const WEBSOCKET_PORT = userConfig.websocket.port;
 
@@ -15,8 +15,9 @@ wss.on('connection', async function connection(ws) {
     console.log('received: %s', data);
     });
 
+    seleccionarJuego("PokemonXY");
 
-    const medallas = await procesarMedallas();
+    const medallas = await leerMedallas();
 
     if(medallas!=null){
          ws.send(medallas);
