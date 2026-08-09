@@ -14,9 +14,14 @@ interface WebsocketConfig {
     port: number;
 }
 
+interface HttpServerConfig {
+    port: number;
+}
+
 interface UserConfigData {
     azahar3ds: Azahar3dsConfig;
     websocket: WebsocketConfig;
+    httpServer: HttpServerConfig;
 }
 
 // Config editable por el usuario (persistida en userConfig.json). Se lee con
@@ -58,6 +63,10 @@ class UserConfig {
 
     get websocket(): WebsocketConfig {
         return this.data.websocket;
+    }
+
+    get httpServer(): HttpServerConfig{
+        return this.data.httpServer;
     }
 }
 

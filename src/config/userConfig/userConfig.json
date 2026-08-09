@@ -5,5 +5,8 @@
   },
   "websocket": {
     "port": 8080
+  },
+  "httpServer":{
+    "port": 8081
   }
 }

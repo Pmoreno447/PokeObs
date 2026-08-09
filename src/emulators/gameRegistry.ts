@@ -6,7 +6,8 @@ let juegoActivo: GameModule | null = null;
 
 //Agrupamos todos los juegos disponibles con su identificador
 const juegosSoportados: Record<string, GameModule> = {
-    "PokemonXY": crearXY("1.0"),
+    "PokemonXY-1.0": crearXY("1.0"),
+    "PokemonXY-1.1": crearXY("1.1")
 }
 
 //Función que establece el juego seleccionado
