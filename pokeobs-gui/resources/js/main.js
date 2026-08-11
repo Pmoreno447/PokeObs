@@ -53,6 +53,8 @@ const elementos = {
     puertoHttp: document.getElementById('puertoHttp'),
     ipCitra: document.getElementById('ipCitra'),
     puertoCitra: document.getElementById('puertoCitra'),
+    vidasIniciales: document.getElementById('vidasIniciales'),
+    vidasActuales: document.getElementById('vidasActuales'),
     estado: document.getElementById('estado'),
     registro: document.getElementById('registro'),
     btnArrancar: document.getElementById('btnArrancar'),
@@ -147,7 +149,8 @@ function fijarEstado(estado, texto) {
 // campos para que lo que se ve en pantalla sea siempre lo que se está usando.
 function bloquearFormulario(bloqueado) {
     [elementos.juego, elementos.puertoWebsocket, elementos.puertoHttp,
-     elementos.ipCitra, elementos.puertoCitra].forEach((campo) => {
+     elementos.ipCitra, elementos.puertoCitra,
+     elementos.vidasIniciales, elementos.vidasActuales].forEach((campo) => {
         campo.disabled = bloqueado;
     });
 
@@ -171,15 +174,21 @@ async function cargarConfiguracion() {
     elementos.puertoHttp.value = configuracion.httpServer.port;
     elementos.ipCitra.value = configuracion.azahar3ds.citraIp;
     elementos.puertoCitra.value = configuracion.azahar3ds.citraPort;
+    elementos.vidasIniciales.value = configuracion.vidas.iniciales;
+    elementos.vidasActuales.value = configuracion.vidas.actuales;
     return true;
 }
 
-function leerPuerto(elemento) {
+function leerEntero(elemento, minimo, maximo) {
     const valor = Number(elemento.value);
-    const valido = Number.isInteger(valor) && valor >= 1 && valor <= 65535;
+    const valido = elemento.value !== '' && Number.isInteger(valor) && valor >= minimo && valor <= maximo;
 
     elemento.classList.toggle('invalido', !valido);
     return valido ? valor : null;
+}
+
+function leerPuerto(elemento) {
+    return leerEntero(elemento, 1, 65535);
 }
 
 // Devuelve los ajustes del formulario, o null si hay algo inválido.
@@ -188,11 +197,22 @@ function validarFormulario() {
     const puertoHttp = leerPuerto(elementos.puertoHttp);
     const puertoCitra = leerPuerto(elementos.puertoCitra);
     const ipCitra = elementos.ipCitra.value.trim();
+    const vidasIniciales = leerEntero(elementos.vidasIniciales, 1, 99);
+    const vidasActuales = leerEntero(elementos.vidasActuales, 0, 99);
 
     elementos.ipCitra.classList.toggle('invalido', ipCitra === '');
 
-    if (!puertoWebsocket || !puertoHttp || !puertoCitra || ipCitra === '') {
-        registrar('Revisa los campos marcados: los puertos van de 1 a 65535 y la IP no puede estar vacía.', true);
+    if (!puertoWebsocket || !puertoHttp || !puertoCitra || ipCitra === ''
+        || vidasIniciales === null || vidasActuales === null) {
+        registrar('Revisa los campos marcados: los puertos van de 1 a 65535, la IP no puede estar vacía y las vidas van de 0 a 99.', true);
+        return null;
+    }
+
+    // Cada vida es un recurso /vidas/N, así que no puede haber más restantes
+    // que totales: sobrarían iconos que nadie puede mostrar.
+    if (vidasActuales > vidasIniciales) {
+        elementos.vidasActuales.classList.add('invalido');
+        registrar('Las vidas restantes no pueden superar a las totales.', true);
         return null;
     }
 
@@ -203,7 +223,7 @@ function validarFormulario() {
         return null;
     }
 
-    return { puertoWebsocket, puertoHttp, ipCitra, puertoCitra };
+    return { puertoWebsocket, puertoHttp, ipCitra, puertoCitra, vidasIniciales, vidasActuales };
 }
 
 // Reescribe solo los campos que gestiona la GUI para no perder el resto.
@@ -212,6 +232,8 @@ async function guardarConfiguracion(ajustes) {
     configuracion.httpServer.port = ajustes.puertoHttp;
     configuracion.azahar3ds.citraIp = ajustes.ipCitra;
     configuracion.azahar3ds.citraPort = ajustes.puertoCitra;
+    configuracion.vidas.iniciales = ajustes.vidasIniciales;
+    configuracion.vidas.actuales = ajustes.vidasActuales;
 
     await Neutralino.filesystem.writeFile(rutas.config, JSON.stringify(configuracion, null, 2) + '\n');
 }
@@ -356,6 +378,11 @@ async function arrancar() {
                 dejarDeEscuchar(procesoBackend.id);
                 procesoBackend = null;
                 bloquearFormulario(false);
+
+                // El backend ha podido escribir las vidas restantes mientras
+                // corría. Sin releer, el formulario seguiría con los valores de
+                // antes de arrancar y los machacaría en el siguiente arranque.
+                cargarConfiguracion();
 
                 // Al pararlo nosotros muere por señal, así que su código de
                 // salida no distingue un cierre normal de un fallo.

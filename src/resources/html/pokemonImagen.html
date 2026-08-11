@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Fondo transparente y sin márgenes: en OBS solo debe verse el sprite. */
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        img.oculto {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <img id="sprite" class="oculto" />
+
+    <script>
+        const miSlot = __SLOT__;
+        const socket = new WebSocket('ws://localhost:__PUERTO_WEBSOCKET__');
+        const imagen = document.getElementById('sprite');
+
+        // Si el sprite de esa especie no existe, mejor no dejar el icono de
+        // imagen rota encima del vídeo.
+        imagen.addEventListener('error', () => imagen.classList.add('oculto'));
+
+        socket.addEventListener('message', (event) => {
+            const datos = JSON.parse(event.data);
+
+            // Por este socket viajan también las medallas.
+            if (datos.tipo !== 'equipo') {
+                return;
+            }
+
+            const pokemon = datos.equipo[miSlot];
+
+            // Se oculta si el hueco está vacío (equipo de menos de 6), si falló
+            // la lectura, o si el Pokémon está debilitado (PS a 0).
+            if (!pokemon || pokemon.hp.actual === 0) {
+                imagen.classList.add('oculto');
+                return;
+            }
+
+            const ruta = `/img/sprites/${pokemon.especie}.png`;
+
+            // Solo se toca el src cuando cambia la especie, si no el navegador
+            // repintaría la misma imagen una vez por segundo.
+            if (!imagen.src.endsWith(ruta)) {
+                imagen.src = ruta;
+            }
+
+            imagen.classList.remove('oculto');
+        });
+    </script>
+</body>
+</html>

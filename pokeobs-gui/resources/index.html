@@ -46,6 +46,24 @@
         <p class="ayuda">Los ajustes se guardan en <code>userConfig.json</code> y se aplican al arrancar.</p>
       </section>
 
+      <section class="tarjeta">
+        <h2>Vidas</h2>
+
+        <div class="campos">
+          <div class="campo">
+            <label for="vidasIniciales">Totales</label>
+            <input id="vidasIniciales" type="number" min="1" max="99" step="1">
+          </div>
+
+          <div class="campo">
+            <label for="vidasActuales">Restantes</label>
+            <input id="vidasActuales" type="number" min="0" max="99" step="1">
+          </div>
+        </div>
+
+        <p class="ayuda">Las restantes bajan solas cuando cae un Pokémon. Edítalas aquí para empezar una partida nueva.</p>
+      </section>
+
       <div class="acciones">
         <button id="btnArrancar" class="boton boton--primario">Arrancar</button>
         <button id="btnParar" class="boton" disabled>Parar</button>

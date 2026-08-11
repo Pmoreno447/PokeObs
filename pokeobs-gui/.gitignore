@@ -11,3 +11,6 @@ neutralino.js
 # Neutralinojs related files
 .storage
 *.log
+
+# Ficheros de ejecución de Neutralino
+.tmp/

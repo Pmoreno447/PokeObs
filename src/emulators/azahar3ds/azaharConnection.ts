@@ -70,27 +70,40 @@ export async function readMemory(address: number, dataSize: number): Promise<Buf
         // Introducimos la promesa en el map, con su id.
         myMap.set(requestId.toString('hex'), resolve);
 
-        client.send(packet, CITRA_PORT, CITRA_IP);
+        obtenerCliente().send(packet, CITRA_PORT, CITRA_IP);
     });
 }
 
 
 // CLIENTE UDP
-const client = dgram.createSocket('udp4');
+let client: dgram.Socket | null = null;
 
 let myMap = new Map<string, Function>();
 
-client.on('message', (msg, rinfo) => {
-    // Cuando recibimos un mensaje resolvemos la promesa.
-    const requestId = msg.subarray(4, 8).toString('hex');
-    const resolve = myMap.get(requestId.toString());
+// El socket se crea en la primera lectura y no al importar el módulo. Importar
+// un juego arrastra su cliente de emulador, así que sin esto cargar el registro
+// abriría también las conexiones de los emuladores que no se están usando.
+function obtenerCliente(): dgram.Socket {
+    if (client !== null) {
+        return client;
+    }
 
-    // Le entregamos los datos a quien corresponda.
-    if(resolve!=null){
-        myMap.delete(requestId.toString());
-        resolve(validateHeader(msg, 1, msg.subarray(4, 8)));
-    }
-    else{
-        console.log("Error al resolver mensaje recibido");
-    }
-})
+    client = dgram.createSocket('udp4');
+
+    client.on('message', (msg, rinfo) => {
+        // Cuando recibimos un mensaje resolvemos la promesa.
+        const requestId = msg.subarray(4, 8).toString('hex');
+        const resolve = myMap.get(requestId.toString());
+
+        // Le entregamos los datos a quien corresponda.
+        if(resolve!=null){
+            myMap.delete(requestId.toString());
+            resolve(validateHeader(msg, 1, msg.subarray(4, 8)));
+        }
+        else{
+            console.log("Error al resolver mensaje recibido");
+        }
+    })
+
+    return client;
+}
