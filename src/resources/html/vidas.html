@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Fondo transparente y sin márgenes: en OBS solo debe verse el icono. */
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        img.perdida {
+            filter: grayscale(100%);
+        }
+    </style>
+</head>
+<body>
+    <img id="vida" class="__CLASE_INICIAL__" src="/img/vida/vida.png" />
+
+    <script>
+        const miNumero = __NUMERO_VIDA__;
+        const socket = new WebSocket('ws://localhost:__PUERTO_WEBSOCKET__');
+        const imagen = document.getElementById('vida');
+
+        socket.addEventListener('message', (event) => {
+            const datos = JSON.parse(event.data);
+
+            // Por este socket viajan también las medallas y el equipo.
+            if (datos.tipo !== 'vidas') {
+                return;
+            }
+
+            // Con 5 vidas restantes, los iconos 1 a 5 van en color y del 6 en
+            // adelante en blanco y negro.
+            if (datos.vidas < miNumero) {
+                imagen.classList.add('perdida');
+            } else {
+                imagen.classList.remove('perdida');
+            }
+        });
+    </script>
+</body>
+</html>

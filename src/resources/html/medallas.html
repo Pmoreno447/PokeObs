@@ -22,7 +22,14 @@
 
         socket.addEventListener('message', (event) => {
             const datos = JSON.parse(event.data);
-            
+
+            // Por este socket viajan también los datos del equipo. Sin filtrar,
+            // datos.medallas sería undefined y "undefined < miNumero" es false,
+            // así que la medalla se pintaría en color aunque no la tengas.
+            if (datos.tipo !== 'medallas') {
+                return;
+            }
+
             if (datos.medallas < miNumero) {
                 imagen.classList.add('sin-conseguir');
             } else {

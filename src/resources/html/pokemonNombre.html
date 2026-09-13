@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Fondo transparente y sin márgenes: en OBS solo debe verse el texto. */
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        #nombre.oculto {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <span id="nombre" class="oculto"></span>
+
+    <script>
+        const miSlot = __SLOT__;
+        const socket = new WebSocket('ws://localhost:__PUERTO_WEBSOCKET__');
+        const texto = document.getElementById('nombre');
+
+        socket.addEventListener('message', (event) => {
+            const datos = JSON.parse(event.data);
+
+            // Por este socket viajan también las medallas.
+            if (datos.tipo !== 'equipo') {
+                return;
+            }
+
+            const pokemon = datos.equipo[miSlot];
+
+            // Se oculta si el hueco está vacío (equipo de menos de 6), si falló
+            // la lectura, o si el Pokémon está debilitado (PS a 0).
+            if (!pokemon || pokemon.hp.actual === 0) {
+                texto.classList.add('oculto');
+                return;
+            }
+
+            texto.textContent = pokemon.nombre;
+            texto.classList.remove('oculto');
+        });
+    </script>
+</body>
+</html>

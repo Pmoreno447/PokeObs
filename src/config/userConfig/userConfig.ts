@@ -14,7 +14,17 @@ interface HttpServerConfig {
     port: number;
 }
 
+interface VidasConfig {
+    // Total configurado: de aquí sale cuántos recursos /vidas/N existen.
+    iniciales: number;
+
+    // Las que quedan ahora mismo. Lo escribe el backend en cada muerte para que
+    // la cuenta sobreviva a cerrar la aplicación.
+    actuales: number;
+}
+
 interface UserConfigData {
+    vidas: VidasConfig;
     azahar3ds: Azahar3dsConfig;
     websocket: WebsocketConfig;
     httpServer: HttpServerConfig;
@@ -51,6 +61,17 @@ class UserConfig {
     // Persiste el estado actual en userConfig.json.
     save(): void {
         writeFileSync(CONFIG_PATH, JSON.stringify(this.data, null, 2) + '\n');
+    }
+
+    get vidas(): VidasConfig {
+        return this.data.vidas;
+    }
+
+    // Único dato que escribe el backend: el resto de la configuración la
+    // gestiona la GUI mientras el servidor está parado.
+    guardarVidasActuales(valor: number): void {
+        this.data.vidas.actuales = valor;
+        this.save();
     }
 
     get azahar3ds(): Azahar3dsConfig {

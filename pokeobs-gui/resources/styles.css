@@ -220,3 +220,226 @@ input.invalido {
 .registro .error {
     color: var(--acento);
 }
+
+.opciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.casilla {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    color: var(--texto);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.casilla input {
+    width: auto;
+    margin: 0;
+    accent-color: var(--acento);
+}
+
+input[type="color"] {
+    height: 34px;
+    padding: 2px;
+    cursor: pointer;
+}
+
+/* --- Muestra de color y selector propio ----------------------------------- */
+
+.muestra {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 10px;
+    background: #12141a;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+    color: var(--texto);
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.muestra:hover:not(:disabled) {
+    border-color: var(--texto-suave);
+}
+
+.muestra:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.muestra-cuadro {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--borde);
+    border-radius: 4px;
+    flex: 0 0 auto;
+}
+
+.muestra-hex {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(10, 11, 15, 0.72);
+    backdrop-filter: blur(3px);
+    z-index: 10;
+}
+
+.modal.oculto {
+    display: none;
+}
+
+.modal-caja {
+    width: 100%;
+    max-width: 360px;
+    padding: 18px;
+    background: var(--tarjeta);
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+
+.paleta {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.paleta button {
+    aspect-ratio: 1;
+    padding: 0;
+    border: 1px solid var(--borde);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.paleta button:hover,
+.paleta button.elegido {
+    outline: 2px solid var(--texto);
+    outline-offset: 1px;
+}
+
+.modal-pie {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-pie input {
+    width: 90px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+}
+
+.modal-pie .boton {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+.previa {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    border: 1px solid var(--borde);
+    border-radius: 6px;
+}
+
+.ayuda a {
+    color: var(--acento);
+    text-decoration: underline;
+}
+
+.familias {
+    margin: 0 0 14px;
+    padding: 0;
+    list-style: none;
+}
+
+.familias li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--borde);
+}
+
+.familias li:last-child {
+    border-bottom: none;
+}
+
+.familias code {
+    color: var(--texto-suave);
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12px;
+}
+
+.familias span {
+    font-size: 17px;
+}
+
+.modal-pie--derecha {
+    justify-content: flex-end;
+}
+
+.boton--ancho {
+    width: 100%;
+    margin-top: 12px;
+}
+
+.oculto {
+    display: none;
+}
+
+.endpoints {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.endpoints li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--borde);
+}
+
+.endpoints li:last-child {
+    border-bottom: none;
+}
+
+.endpoints .url {
+    display: block;
+    color: var(--texto);
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    user-select: text;
+    word-break: break-all;
+}
+
+.endpoints .rango {
+    color: var(--acento);
+    font-size: 12px;
+}
+
+.endpoints .descripcion {
+    margin: 4px 0 0;
+    color: var(--texto-suave);
+    font-size: 12px;
+    line-height: 1.45;
+}
