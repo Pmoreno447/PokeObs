@@ -12,13 +12,13 @@
         <span id="estado" class="estado estado--parado">Parado</span>
       </header>
 
-      <section class="tarjeta">
+      <section class="tarjeta seccion-config">
         <h2>Juego</h2>
         <label for="juego">Juego y versión</label>
         <select id="juego"></select>
       </section>
 
-      <section class="tarjeta">
+      <section class="tarjeta seccion-config">
         <h2>Ajustes</h2>
 
         <div class="campos">
@@ -33,20 +33,35 @@
           </div>
 
           <div class="campo">
-            <label for="ipCitra">IP de Citra / Azahar</label>
-            <input id="ipCitra" type="text" spellcheck="false">
+            <label for="ipEmulador">IP del emulador</label>
+            <input id="ipEmulador" type="text" spellcheck="false">
           </div>
 
           <div class="campo">
-            <label for="puertoCitra">Puerto de Citra / Azahar</label>
-            <input id="puertoCitra" type="number" min="1" max="65535" step="1">
+            <label for="puertoEmulador">Puerto del emulador</label>
+            <input id="puertoEmulador" type="number" min="1" max="65535" step="1">
           </div>
         </div>
 
         <p class="ayuda">Los ajustes se guardan en <code>userConfig.json</code> y se aplican al arrancar.</p>
       </section>
 
-      <section class="tarjeta">
+      <section class="tarjeta seccion-config">
+        <h2>Imágenes</h2>
+
+        <label>Carpeta de recursos</label>
+        <button id="botonRuta" class="muestra" type="button">
+          <span class="muestra-hex" id="rutaRecursosTexto"></span>
+        </button>
+        <input id="rutaRecursos" type="hidden">
+
+        <p class="ayuda">Dentro debe haber <code>medallas/</code>, <code>pokemon/</code>
+          y <code>vida/</code>. PokeObs no incluye ninguna imagen: las pones tú.</p>
+
+        <button id="btnSprites" class="boton boton--ancho" type="button">Descargar sprites de PokeAPI</button>
+      </section>
+
+      <section class="tarjeta seccion-config">
         <h2>Vidas</h2>
 
         <div class="campos">
@@ -64,11 +79,60 @@
         <p class="ayuda">Las restantes bajan solas cuando cae un Pokémon. Edítalas aquí para empezar una partida nueva.</p>
       </section>
 
+      <section class="tarjeta seccion-config">
+        <h2>Tipografía</h2>
+
+        <div class="campos">
+          <div class="campo">
+            <label for="fuenteNombre">Fuente · nombre</label>
+            <input id="fuenteNombre" type="text" spellcheck="false" placeholder="sans-serif">
+          </div>
+
+          <div class="campo">
+            <label for="fuenteVidas">Fuente · vidas</label>
+            <input id="fuenteVidas" type="text" spellcheck="false" placeholder="sans-serif">
+          </div>
+
+          <div class="campo">
+            <label for="botonColorNombre">Color · nombre</label>
+            <input id="colorNombre" type="hidden">
+            <button id="botonColorNombre" class="muestra" type="button">
+              <span class="muestra-cuadro"></span><span class="muestra-hex"></span>
+            </button>
+          </div>
+
+          <div class="campo">
+            <label for="botonColorVidas">Color · vidas</label>
+            <input id="colorVidas" type="hidden">
+            <button id="botonColorVidas" class="muestra" type="button">
+              <span class="muestra-cuadro"></span><span class="muestra-hex"></span>
+            </button>
+          </div>
+        </div>
+
+        <div class="opciones">
+          <label class="casilla"><input id="negritaNombre" type="checkbox"> Nombre en negrita</label>
+          <label class="casilla"><input id="negritaVidas" type="checkbox"> Vidas en negrita</label>
+          <label class="casilla"><input id="cursivaNombre" type="checkbox"> Nombre en cursiva</label>
+          <label class="casilla"><input id="cursivaVidas" type="checkbox"> Vidas en cursiva</label>
+        </div>
+
+        <p class="ayuda">
+          La fuente debe estar instalada en el sistema. Se aplica al arrancar.
+          <a href="#" id="enlaceFuentes">Fuentes que funcionan siempre</a>
+        </p>
+      </section>
+
       <div class="acciones">
         <button id="btnArrancar" class="boton boton--primario">Arrancar</button>
         <button id="btnParar" class="boton" disabled>Parar</button>
-        <button id="btnCompilar" class="boton boton--secundario">Compilar</button>
       </div>
+
+      <section id="panelEndpoints" class="tarjeta oculto">
+        <h2>Fuentes para OBS</h2>
+        <ul id="listaEndpoints" class="endpoints"></ul>
+        <p class="ayuda">Añádelas en OBS como fuente de <strong>Navegador</strong>. Todas tienen el fondo transparente.</p>
+      </section>
 
       <section class="tarjeta tarjeta--registro">
         <div class="registro-cabecera">
@@ -78,6 +142,47 @@
         <pre id="registro" class="registro"></pre>
       </section>
     </main>
+
+    <!-- Las familias genéricas de CSS: no dependen de lo que haya instalado,
+         el navegador siempre resuelve alguna. -->
+    <div id="ayudaFuentes" class="modal oculto">
+      <div class="modal-caja">
+        <h2>Fuentes que funcionan siempre</h2>
+
+        <ul class="familias">
+          <li><code>sans-serif</code><span style="font-family: sans-serif">Ejemplo 123</span></li>
+          <li><code>serif</code><span style="font-family: serif">Ejemplo 123</span></li>
+          <li><code>monospace</code><span style="font-family: monospace">Ejemplo 123</span></li>
+          <li><code>cursive</code><span style="font-family: cursive">Ejemplo 123</span></li>
+          <li><code>fantasy</code><span style="font-family: fantasy">Ejemplo 123</span></li>
+          <li><code>system-ui</code><span style="font-family: system-ui">Ejemplo 123</span></li>
+        </ul>
+
+        <p class="ayuda">Cada sistema elige qué tipografía concreta usa para cada
+          familia, así que se verán algo distintas en otro ordenador. Cualquier otro
+          nombre solo funciona si esa fuente está instalada en la máquina.</p>
+
+        <div class="modal-pie modal-pie--derecha">
+          <button id="ayudaFuentesCerrar" class="boton boton--primario" type="button">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selector de color propio: el nativo se ancla al campo y en una ventana
+         pequeña se sale por los bordes. -->
+    <div id="selectorColor" class="modal oculto">
+      <div class="modal-caja">
+        <h2>Color</h2>
+        <div id="paleta" class="paleta"></div>
+
+        <div class="modal-pie">
+          <span class="previa" id="colorPrevia"></span>
+          <input id="colorHex" type="text" spellcheck="false" maxlength="7" placeholder="#ffffff">
+          <button id="colorCancelar" class="boton" type="button">Cancelar</button>
+          <button id="colorAceptar" class="boton boton--primario" type="button">Aceptar</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Neutralino.js client. This file is gitignored,
         because `neu update` typically downloads it.
