@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { Server } from 'node:http';
 import { userConfig } from "./config/userConfig/userConfig.js";
+import type { EstiloTexto } from "./config/userConfig/userConfig.js";
 import { RUTA_RECURSOS } from "./config/paths.js";
 import { SLOTS_EQUIPO } from "./emulators/gameModule.js";
 import { vidasRestantes } from "./contadorVidas.js";
@@ -23,6 +24,23 @@ function renderizar(plantilla: string, sustituciones: Record<string, string>): s
         (texto, [marca, valor]) => texto.replaceAll(marca, valor),
         html
     );
+}
+
+// La fuente y el color acaban dentro de un bloque <style>, así que se quitan los
+// caracteres que permitirían cerrar la regla y colar CSS arbitrario.
+function limpiarCss(valor: string): string {
+    return valor.replace(/[{}<>;\\]/g, '').trim();
+}
+
+// Traduce la configuración de tipografía a declaraciones CSS. Cada overlay de
+// texto recibe las suyas, que se inyectan en la plantilla al servirla.
+function estiloTexto(estilo: EstiloTexto): string {
+    return [
+        `font-family: ${limpiarCss(estilo.fuente) || 'sans-serif'};`,
+        `font-weight: ${estilo.negrita ? 'bold' : 'normal'};`,
+        `font-style: ${estilo.cursiva ? 'italic' : 'normal'};`,
+        `color: ${limpiarCss(estilo.color) || '#ffffff'};`,
+    ].join('\n            ');
 }
 
 // Sirve los recursos HTML que se añaden como fuente de navegador en OBS.
@@ -62,7 +80,20 @@ export function iniciarHttpServer(): Promise<Server> {
             return;
         }
 
-        res.send(renderizar('pokemonNombre.html', { __SLOT__: String(slot) }));
+        res.send(renderizar('pokemonNombre.html', {
+            __SLOT__: String(slot),
+            __ESTILO__: estiloTexto(userConfig.estilos.nombrePokemon),
+        }));
+    });
+
+    // El contador en texto. Va sin número en la ruta porque no es una vida
+    // concreta, sino cuántas quedan. Devuelve el número pelado: si alguien
+    // quiere "3/15" o una etiqueta al lado, lo pone en la plantilla.
+    app.get('/vidas', (_req, res) => {
+        res.send(renderizar('vidasTexto.html', {
+            __TEXTO_INICIAL__: String(vidasRestantes()),
+            __ESTILO__: estiloTexto(userConfig.estilos.vidas),
+        }));
     });
 
     // Una vida por recurso, igual que las medallas, para poder colocarlas en la
@@ -84,7 +115,15 @@ export function iniciarHttpServer(): Promise<Server> {
         }));
     });
 
-    app.use('/img', express.static(path.join(RUTA_RECURSOS, 'img')));
+    // Las imágenes las pone el usuario: la aplicación no distribuye ninguna. Se
+    // esperan las subcarpetas medallas/, pokemon/ y vida/ dentro de la ruta
+    // configurada.
+    if (userConfig.rutaRecursos) {
+        app.use('/img', express.static(userConfig.rutaRecursos));
+        console.log(`[httpServer] Imágenes servidas desde ${userConfig.rutaRecursos}`);
+    } else {
+        console.warn('[httpServer] Sin carpeta de imágenes configurada: los overlays de imagen saldrán vacíos');
+    }
 
     return new Promise((resolve, reject) => {
         const servidor = app.listen(puerto, () => {
