@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run sprites",
+    "sprites": "node src/scripts/descargarSprites.mjs",
     "start": "npm run build && node dist/src/main.js",
     "gui": "cd pokeobs-gui && neu run",
     "test": "echo \"Error: no test specified\" && exit 1"

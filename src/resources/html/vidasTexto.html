@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Fondo transparente y sin márgenes: en OBS solo debe verse el texto. */
+        body {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        /* Tipografía inyectada desde userConfig.json al servir la página. */
+        #contador {
+            __ESTILO__
+        }
+    </style>
+</head>
+<body>
+    <span id="contador">__TEXTO_INICIAL__</span>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:__PUERTO_WEBSOCKET__');
+        const contador = document.getElementById('contador');
+
+        function comoTexto(vidas) {
+            return `${vidas}`;
+        }
+
+        socket.addEventListener('message', (event) => {
+            const datos = JSON.parse(event.data);
+
+            // Por este socket viajan también las medallas y el equipo.
+            if (datos.tipo !== 'vidas') {
+                return;
+            }
+
+            contador.textContent = comoTexto(datos.vidas);
+        });
+    </script>
+</body>
+</html>

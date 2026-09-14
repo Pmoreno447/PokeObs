@@ -1,9 +1,12 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { RUTA_CONFIG as CONFIG_PATH } from '../paths.js';
 
-interface Azahar3dsConfig {
-    citraIp: string;
-    citraPort: number;
+// Datos de conexión del emulador activo. Hay un único hueco a propósito: se
+// configura "el emulador", no uno por marca, así que añadir soporte para otro no
+// obliga a decidir de qué sección leer.
+interface EmuladorConfig {
+    ip: string;
+    puerto: number;
 }
 
 interface WebsocketConfig {
@@ -23,9 +26,28 @@ interface VidasConfig {
     actuales: number;
 }
 
+// Tipografía de un overlay de texto. Cada overlay lleva la suya: el nombre del
+// Pokémon y el contador de vidas se configuran por separado.
+export interface EstiloTexto {
+    fuente: string;
+    negrita: boolean;
+    cursiva: boolean;
+    color: string;
+}
+
+interface EstilosConfig {
+    nombrePokemon: EstiloTexto;
+    vidas: EstiloTexto;
+}
+
 interface UserConfigData {
+    // Carpeta del usuario con sus imágenes: medallas/, pokemon/ y vida/. La
+    // aplicación no distribuye ninguna, así que sin esto no hay imágenes.
+    rutaRecursos: string;
+
     vidas: VidasConfig;
-    azahar3ds: Azahar3dsConfig;
+    estilos: EstilosConfig;
+    emulador: EmuladorConfig;
     websocket: WebsocketConfig;
     httpServer: HttpServerConfig;
 }
@@ -63,6 +85,10 @@ class UserConfig {
         writeFileSync(CONFIG_PATH, JSON.stringify(this.data, null, 2) + '\n');
     }
 
+    get rutaRecursos(): string {
+        return this.data.rutaRecursos;
+    }
+
     get vidas(): VidasConfig {
         return this.data.vidas;
     }
@@ -74,8 +100,12 @@ class UserConfig {
         this.save();
     }
 
-    get azahar3ds(): Azahar3dsConfig {
-        return this.data.azahar3ds;
+    get estilos(): EstilosConfig {
+        return this.data.estilos;
+    }
+
+    get emulador(): EmuladorConfig {
+        return this.data.emulador;
     }
 
     get websocket(): WebsocketConfig {

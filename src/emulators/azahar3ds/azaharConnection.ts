@@ -3,8 +3,8 @@ import dgram from 'node:dgram';
 import {AZAHAR_CURRENT_REQUEST_VERSION} from '../../config/constants.js'
 import { userConfig } from '../../config/userConfig/userConfig.js'
 
-const CITRA_PORT = userConfig.azahar3ds.citraPort;
-const CITRA_IP = userConfig.azahar3ds.citraIp;
+const PUERTO_EMULADOR = userConfig.emulador.puerto;
+const IP_EMULADOR = userConfig.emulador.ip;
 
 // Cabecera del datagrama (16 bytes) — protocolo de comunicación con el emulador Azahar (3DS)
 //
@@ -70,7 +70,7 @@ export async function readMemory(address: number, dataSize: number): Promise<Buf
         // Introducimos la promesa en el map, con su id.
         myMap.set(requestId.toString('hex'), resolve);
 
-        obtenerCliente().send(packet, CITRA_PORT, CITRA_IP);
+        obtenerCliente().send(packet, PUERTO_EMULADOR, IP_EMULADOR);
     });
 }
 

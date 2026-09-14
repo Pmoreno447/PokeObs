@@ -1,16 +1,31 @@
 {
+  "rutaRecursos": "/Users/pmoreno/Documents/PokeObs/src/resources/img",
   "vidas": {
     "iniciales": 3,
     "actuales": 1
   },
-  "azahar3ds": {
-    "citraPort": 45987,
-    "citraIp": "127.0.0.1"
+  "emulador": {
+    "ip": "127.0.0.1",
+    "puerto": 45987
   },
   "websocket": {
     "port": 8081
   },
   "httpServer": {
     "port": 8082
+  },
+  "estilos": {
+    "nombrePokemon": {
+      "fuente": "sans-serif",
+      "negrita": true,
+      "cursiva": true,
+      "color": "#ef5350"
+    },
+    "vidas": {
+      "fuente": "sans-serif",
+      "negrita": true,
+      "cursiva": false,
+      "color": "#7e57c2"
+    }
   }
 }
