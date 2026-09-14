@@ -5,9 +5,14 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc && npm run sprites",
-    "sprites": "node src/scripts/descargarSprites.mjs",
+    "sprites": "node dist/src/main.js --descargar-sprites",
+    "empaquetar": "npm run empaquetar:gui && npm run empaquetar:backend && npm run empaquetar:app",
+    "empaquetar:gui": "cd pokeobs-gui && neu build",
+    "empaquetar:backend": "node src/scripts/empaquetarBackend.mjs",
+    "empaquetar:app": "node src/scripts/empaquetarApp.mjs",
     "start": "npm run build && node dist/src/main.js",
     "gui": "cd pokeobs-gui && neu run",
+    "gui:binarios": "cd pokeobs-gui && neu update",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,9 +20,12 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@neutralinojs/neu": "^11.7.2",
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.2",
     "@types/ws": "^8.18.1",
+    "esbuild": "^0.28.2",
+    "postject": "^1.0.0-alpha.6",
     "typescript": "^7.0.2"
   },
   "dependencies": {

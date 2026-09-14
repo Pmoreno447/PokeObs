@@ -1,21 +1,18 @@
 import express from "express";
-import fs from 'node:fs';
-import path from 'node:path';
 import type { Server } from 'node:http';
 import { userConfig } from "./config/userConfig/userConfig.js";
 import type { EstiloTexto } from "./config/userConfig/userConfig.js";
-import { RUTA_RECURSOS } from "./config/paths.js";
 import { SLOTS_EQUIPO } from "./emulators/gameModule.js";
 import { vidasRestantes } from "./contadorVidas.js";
+import { leerPlantilla } from "./plantillas.js";
 
-const RUTA_PLANTILLAS = path.join(RUTA_RECURSOS, 'html');
 const TOTAL_MEDALLAS = 8;
 
 // Rellena una plantilla HTML. El puerto del WebSocket va siempre porque el
 // overlay se conecta desde el navegador de OBS, así que tiene que viajar dentro
 // del propio HTML.
 function renderizar(plantilla: string, sustituciones: Record<string, string>): string {
-    const html = fs.readFileSync(path.join(RUTA_PLANTILLAS, plantilla), 'utf-8');
+    const html = leerPlantilla(plantilla);
 
     return Object.entries({
         __PUERTO_WEBSOCKET__: String(userConfig.websocket.port),

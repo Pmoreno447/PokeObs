@@ -4,43 +4,90 @@
 //   1. Editar userConfig.json (puertos y IP de Citra), que es la configuración
 //      persistente que lee el backend al arrancar.
 //   2. Elegir el juego, que NO se persiste: se pasa como argumento al proceso.
-//   3. Lanzar el backend (dist/src/main.js), que arranca el overlayServer y,
-//      una vez está escuchando, el httpServer.
+//   3. Lanzar el backend (el ejecutable empaquetado o, en desarrollo,
+//      dist/src/main.js), que arranca el overlayServer y después el httpServer.
 
-const RUTA_BACKEND = 'dist/src/main.js';
+// La GUI funciona de dos formas, y resolverRutas() decide cuál al arrancar:
+//
+//   - Empaquetada: el ejecutable del backend está junto al de la GUI y la
+//     configuración vive en la carpeta de datos del usuario, que es donde el
+//     sistema deja escribir (no dentro de un .app ni de Archivos de programa).
+//   - Desarrollo: la GUI vive dentro del repositorio, el backend se ejecuta con
+//     node dist/src/main.js y la configuración es la del propio proyecto.
+const EJECUTABLE_BACKEND = NL_OS === 'Windows' ? 'pokeobs-backend.exe' : 'pokeobs-backend';
 
-// La GUI vive dentro del repo, así que la raíz del proyecto es su carpeta
-// padre. Se resuelve al arrancar porque en modo desarrollo NL_PATH es relativo.
 const rutas = {
-    proyecto: '',
+    empaquetada: false,
+    trabajo: '',        // directorio desde el que se lanzan los procesos
+    backend: '',        // orden base del backend
+    comprobacion: '',   // fichero que tiene que existir para poder arrancar
     config: '',
 };
 
-// getAbsolutePath deja los "." y ".." tal cual y spawnProcess no acepta un cwd
-// sin resolver, así que lo colapsamos a mano.
-function normalizar(ruta) {
-    const partes = [];
+async function existe(ruta) {
+    try {
+        await Neutralino.filesystem.getStats(ruta);
+        return true;
+    } catch {
+        return false;
+    }
+}
 
-    ruta.split('/').forEach((parte) => {
+// Colapsa los "." y ".." de una ruta absoluta. Neutralino no lo hace (ni con
+// getAbsolutePath ni con getNormalizedPath), y en desarrollo NL_PATH es ".".
+// Acepta separadores de Windows y conserva la letra de unidad.
+function colapsarRuta(ruta) {
+    const partes = ruta.split(/[\\/]+/);
+    const raiz = partes.shift();   // '' en macOS y Linux, 'C:' en Windows
+    const resultado = [];
+
+    partes.forEach((parte) => {
         if (parte === '' || parte === '.') {
             return;
         }
 
         if (parte === '..') {
-            partes.pop();
+            resultado.pop();
         } else {
-            partes.push(parte);
+            resultado.push(parte);
         }
     });
 
-    return `/${partes.join('/')}`;
+    return `${raiz}/${resultado.join('/')}`;
 }
 
 async function resolverRutas() {
-    const rutaGui = await Neutralino.filesystem.getAbsolutePath(NL_PATH);
+    const rutaGui = colapsarRuta(await Neutralino.filesystem.getAbsolutePath(NL_PATH));
+    const ejecutable = `${rutaGui}/${EJECUTABLE_BACKEND}`;
 
-    rutas.proyecto = normalizar(`${rutaGui}/..`);
-    rutas.config = `${rutas.proyecto}/src/config/userConfig/userConfig.json`;
+    if (await existe(ejecutable)) {
+        rutas.empaquetada = true;
+        rutas.trabajo = rutaGui;
+        rutas.backend = `"${ejecutable}"`;
+        rutas.comprobacion = ejecutable;
+        rutas.config = colapsarRuta(`${await Neutralino.os.getPath('data')}/PokeObs/userConfig.json`);
+        return;
+    }
+
+    const proyecto = colapsarRuta(`${rutaGui}/..`);
+    rutas.empaquetada = false;
+    rutas.trabajo = proyecto;
+    rutas.backend = 'node dist/src/main.js';
+    rutas.comprobacion = `${proyecto}/dist/src/main.js`;
+    rutas.config = `${proyecto}/src/config/userConfig/userConfig.json`;
+}
+
+// Orden completa para el backend. La configuración se indica siempre de forma
+// explícita, para que la GUI y el backend lean y escriban el mismo fichero en
+// cualquiera de los dos modos.
+function comandoBackend(argumentos) {
+    return `${rutas.backend} ${argumentos} --config="${rutas.config}"`;
+}
+
+function mensajeSinBackend() {
+    return rutas.empaquetada
+        ? `Falta ${EJECUTABLE_BACKEND} junto a la aplicación. Vuelve a descargar PokeObs.`
+        : 'El backend no está compilado. Ejecuta "npm run build" en el proyecto.';
 }
 
 // Si no se puede consultar al backend (todavía no compilado), al menos el
@@ -125,7 +172,7 @@ function dejarDeEscuchar(id) {
 
 // Lanza un comando y espera a que termine, devolviendo su salida.
 async function ejecutar(comando, { alRecibir } = {}) {
-    const proceso = await Neutralino.os.spawnProcess(comando, { cwd: rutas.proyecto });
+    const proceso = await Neutralino.os.spawnProcess(comando, { cwd: rutas.trabajo });
 
     return new Promise((resolver) => {
         let salida = '';
@@ -405,7 +452,7 @@ function pintarJuegos(juegos) {
 async function cargarJuegos() {
     if (!(await existeBackend())) {
         pintarJuegos(JUEGOS_POR_DEFECTO);
-        registrar('El backend no está compilado. Ejecuta "npm run build" en el proyecto.', true);
+        registrar(mensajeSinBackend(), true);
         return;
     }
 
@@ -413,7 +460,7 @@ async function cargarJuegos() {
     let resultado;
 
     try {
-        resultado = await ejecutar(`node ${RUTA_BACKEND} --listar-juegos`);
+        resultado = await ejecutar(comandoBackend('--listar-juegos'));
         const juegos = JSON.parse(resultado.salida.trim());
 
         if (juegos.length) {
@@ -431,12 +478,7 @@ async function cargarJuegos() {
 }
 
 async function existeBackend() {
-    try {
-        await Neutralino.filesystem.getStats(`${rutas.proyecto}/${RUTA_BACKEND}`);
-        return true;
-    } catch {
-        return false;
-    }
+    return existe(rutas.comprobacion);
 }
 
 // --- Acciones ---------------------------------------------------------------
@@ -457,7 +499,7 @@ async function descargarSprites() {
     registrar(`Descargando sprites en ${ruta}/pokemon ...`);
 
     try {
-        const { codigo } = await ejecutar(`node src/scripts/descargarSprites.mjs --destino="${ruta}"`, {
+        const { codigo } = await ejecutar(comandoBackend(`--descargar-sprites --destino="${ruta}"`), {
             alRecibir: (datos, esError) => registrar(datos, esError),
         });
 
@@ -480,7 +522,7 @@ async function arrancar() {
     }
 
     if (!(await existeBackend())) {
-        registrar('No existe dist/src/main.js. Ejecuta "npm run build" en el proyecto.', true);
+        registrar(mensajeSinBackend(), true);
         return;
     }
 
@@ -499,8 +541,8 @@ async function arrancar() {
 
     try {
         procesoBackend = await Neutralino.os.spawnProcess(
-            `node ${RUTA_BACKEND} ${juego}`,
-            { cwd: rutas.proyecto }
+            comandoBackend(juego),
+            { cwd: rutas.trabajo }
         );
     } catch (error) {
         procesoBackend = null;
@@ -749,7 +791,10 @@ elementos.btnLimpiar.addEventListener('click', () => {
 
 (async () => {
     await resolverRutas();
-    await cargarConfiguracion();
+
+    // Primero se consulta al backend: la primera vez que se abre la aplicación
+    // empaquetada es él quien crea userConfig.json con los valores por defecto.
     await cargarJuegos();
+    await cargarConfiguracion();
 
 })();

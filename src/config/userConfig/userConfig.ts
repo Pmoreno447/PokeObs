@@ -1,5 +1,8 @@
-import { readFileSync, writeFileSync } from 'node:fs';
-import { RUTA_CONFIG as CONFIG_PATH } from '../paths.js';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { rutaConfig } from '../paths.js';
+
+const CONFIG_PATH = rutaConfig();
 
 // Datos de conexión del emulador activo. Hay un único hueco a propósito: se
 // configura "el emulador", no uno por marca, así que añadir soporte para otro no
@@ -52,6 +55,37 @@ interface UserConfigData {
     httpServer: HttpServerConfig;
 }
 
+// Valores con los que se crea userConfig.json la primera vez. También rellenan
+// las claves que falten en un fichero antiguo, para que añadir una opción nueva
+// no rompa la configuración de quien ya tenía la aplicación.
+const CONFIG_POR_DEFECTO: UserConfigData = {
+    rutaRecursos: '',
+    vidas: { iniciales: 3, actuales: 3 },
+    emulador: { ip: '127.0.0.1', puerto: 45987 },
+    websocket: { port: 8081 },
+    httpServer: { port: 8082 },
+    estilos: {
+        nombrePokemon: { fuente: 'sans-serif', negrita: false, cursiva: false, color: '#ffffff' },
+        vidas: { fuente: 'sans-serif', negrita: true, cursiva: false, color: '#ffffff' },
+    },
+};
+
+// Completa en profundidad lo que falte en "leido" con lo que haya en "base".
+function completarConPorDefecto<T>(base: T, leido: unknown): T {
+    if (typeof base !== 'object' || base === null || Array.isArray(base)) {
+        return (leido === undefined ? base : leido) as T;
+    }
+
+    const origen = (typeof leido === 'object' && leido !== null ? leido : {}) as Record<string, unknown>;
+    const resultado: Record<string, unknown> = { ...origen };
+
+    for (const [clave, valor] of Object.entries(base as Record<string, unknown>)) {
+        resultado[clave] = completarConPorDefecto(valor, origen[clave]);
+    }
+
+    return resultado as T;
+}
+
 // Config editable por el usuario (persistida en userConfig.json). Se lee con
 // fs en lugar de un import JSON estático para poder recargarla/guardarla en
 // caliente cuando exista la interfaz de configuración.
@@ -71,8 +105,15 @@ class UserConfig {
     }
 
     private readFromDisk(): UserConfigData {
-        const raw = readFileSync(CONFIG_PATH, 'utf-8');
-        return JSON.parse(raw) as UserConfigData;
+        // La primera vez que se abre la aplicación empaquetada no hay fichero en
+        // la carpeta de datos del usuario: se crea con los valores por defecto.
+        if (!existsSync(CONFIG_PATH)) {
+            mkdirSync(path.dirname(CONFIG_PATH), { recursive: true });
+            writeFileSync(CONFIG_PATH, JSON.stringify(CONFIG_POR_DEFECTO, null, 2) + '\n');
+        }
+
+        const leido = JSON.parse(readFileSync(CONFIG_PATH, 'utf-8'));
+        return completarConPorDefecto(CONFIG_POR_DEFECTO, leido);
     }
 
     // Descarta los cambios en memoria y vuelve a leer el fichero del disco.

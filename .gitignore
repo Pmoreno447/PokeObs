@@ -146,3 +146,7 @@ vite.config.ts.timestamp-*
 # (npm run build los descarga solo). Las medallas y demás recursos propios sí
 # van en el repositorio.
 src/resources/img/sprites/
+
+# Artefactos de empaquetado (npm run empaquetar)
+build/
+release/
