@@ -5,6 +5,7 @@ real: medallas, equipo y vidas de un Nuzlocke. Este manual explica cada opción 
 la aplicación y cómo llevar esos datos a OBS.
 
 - [Manual de usuario](#manual-de-usuario)
+  - [Instalación](#instalación)
   - [Puesta en marcha rápida](#puesta-en-marcha-rápida)
   - [Configuración](#configuración)
     - [Juego](#juego)
@@ -20,6 +21,77 @@ la aplicación y cómo llevar esos datos a OBS.
     - [Añadir una fuente en OBS](#añadir-una-fuente-en-obs)
     - [Registro](#registro)
   - [Solución de problemas](#solución-de-problemas)
+
+---
+
+## Instalación
+
+Descarga el paquete de tu sistema desde la página de
+[Releases](https://github.com/Pmoreno447/PokeObs/releases). PokeObs lleva dentro
+todo lo que necesita: no hace falta instalar nada más.
+
+| Sistema | Fichero |
+|---|---|
+| macOS con procesador Apple (M1 o posterior) | `PokeObs-macos-arm64.zip` |
+| Windows de 64 bits | `PokeObs-windows-x64.zip` |
+| Linux de 64 bits | `PokeObs-linux-x64.tar.gz` |
+
+> [!NOTE]
+> PokeObs es gratuito y no está firmado con un certificado de pago, así que tu
+> sistema te avisará la primera vez que lo abras. Es normal: más abajo tienes
+> cómo continuar en cada caso.
+
+### macOS
+
+1. Descomprime el zip y arrastra **PokeObs** a la carpeta **Aplicaciones**.
+2. Ábrelo. macOS mostrará un aviso de que no puede comprobar el desarrollador.
+3. Ve a **Ajustes del Sistema → Privacidad y seguridad**, busca el aviso sobre
+   PokeObs al final de la página y pulsa **Abrir igualmente**.
+
+Solo tendrás que hacerlo la primera vez. Los Mac con procesador Intel no están
+soportados por ahora.
+
+### Windows
+
+1. Descomprime el zip en una carpeta, por ejemplo en **Documentos**.
+2. Abre `PokeObs.exe`.
+3. Si aparece **Windows protegió tu PC**, pulsa **Más información** y después
+   **Ejecutar de todas formas**.
+4. Al pulsar **Arrancar** por primera vez, el Firewall de Windows puede preguntar
+   si permites el acceso de `pokeobs-backend`. Puedes permitirlo solo en redes
+   privadas: OBS se conecta desde el mismo ordenador.
+
+> [!IMPORTANT]
+> Mantén juntos los ficheros de la carpeta. `PokeObs.exe` necesita tener a su
+> lado `pokeobs-backend.exe` y `resources.neu`.
+
+### Linux
+
+1. Descomprime el paquete:
+
+   ```bash
+   tar -xzf PokeObs-linux-x64.tar.gz
+   ```
+
+2. PokeObs necesita **WebKitGTK**. En Ubuntu o Debian:
+
+   ```bash
+   sudo apt install libwebkit2gtk-4.1-0
+   ```
+
+3. Abre `PokeObs` desde la carpeta descomprimida.
+
+### Dónde se guarda tu configuración
+
+La configuración se guarda fuera de la carpeta del programa, así que **se
+conserva al actualizar PokeObs**: basta con sustituir la versión antigua por la
+nueva.
+
+| Sistema | Carpeta |
+|---|---|
+| macOS | `~/Library/Application Support/PokeObs/` |
+| Windows | `%APPDATA%\PokeObs\` |
+| Linux | `~/.local/share/PokeObs/` |
 
 ---
 
